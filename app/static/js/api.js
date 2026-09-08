@@ -380,20 +380,6 @@ async function startCheckout() {
       emi: false,
       paylater: false,
     },
-    config: {
-      display: {
-        blocks: {
-          upi: {
-            name: "Pay via UPI",
-            instruments: [
-              { method: "upi", flows: ["intent", "collect"] },
-            ],
-          },
-        },
-        sequence: ["block.upi"],
-        preferences: { show_default_blocks: false },
-      },
-    },
     handler: async function (response) {
       try {
         await apiFetch("/api/billing/verify", {
