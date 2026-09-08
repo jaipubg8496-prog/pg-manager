@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from jose import jwt, JWTError
-from passlib.context import CryptContext
+import bcrypt
 
 from app.config import settings
 
@@ -9,13 +9,15 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    password_bytes = password.encode("utf-8")
+    hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+    return hashed.decode("utf-8")
 
+def verify_password(plain_password, hashed_password):
+    password_bytes = plain_password.encode("utf-8")
+    hash_bytes = hashed_password.encode("utf-8")
 
-def verify_password(plain_password: str, hashed_password: str | None) -> bool:
-    if not hashed_password:
-        return False  # Google-only account — no password to check against
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(password_bytes, hash_bytes)
 
 
 def create_access_token(data: dict) -> str:
