@@ -359,54 +359,71 @@ async function startCheckout() {
   const owner = await apiFetch("/api/auth/me").catch(() => null);
 
   const razorpay = new Razorpay({
-    key: order.key_id,
-    order_id: order.order_id,
-    amount: order.amount_paise,
-    currency: order.currency,
-    name: "PG Manager",
-    description: "Monthly subscription",
-    prefill: owner ? { name: owner.name, email: owner.email, contact: owner.phone } : {},
-    theme: { color: "#7A2E2E" },
-    // Restrict checkout to UPI only, and prefer the "intent" flow — this is
-    // what opens an installed app (PhonePe, GPay, Paytm) directly to approve
-    // the payment, rather than showing a card/netbanking form. "collect" is
-    // kept too as a fallback for desktop, where it sends a payment request
-    // the person approves inside their UPI app instead of an app redirect.
-    method: {
-      upi: true,
-      card: false,
-      netbanking: false,
-      wallet: false,
-      emi: false,
-      paylater: false,
-    },
-    handler: async function (response) {
-      try {
-        await apiFetch("/api/billing/verify", {
-          method: "POST",
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-          }),
-        });
-        showToast("Subscription activated — thank you!");
-        clearPaywall();
-        window.location.reload();
-      } catch (err) {
-        showToast(err.message, true);
+  key: order.key_id,
+  order_id: order.order_id,
+  amount: order.amount_paise,
+  currency: order.currency,
+
+  name: "PG Manager",
+  description: "Monthly subscription",
+
+  prefill: owner
+    ? {
+        name: owner.name,
+        email: owner.email,
+        contact: owner.phone,
       }
-    },
-    modal: {
-      ondismiss: function () {
-        showToast("Payment cancelled.", true);
-      },
-    },
-  });
+    : {},
 
-  razorpay.on("payment.failed", function () {
-    showToast("Payment failed. No charge was applied — try again.", true);
-  });
+  theme: {
+    color: "#7A2E2E",
+  },
 
-  razorpay.open();
+  method: {
+    upi: true,
+    card: false,
+    netbanking: false,
+    wallet: false,
+    emi: false,
+    paylater: false,
+  },
+
+  handler: async function (response) {
+    try {
+      await apiFetch("/api/billing/verify", {
+        method: "POST",
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+        }),
+      });
+
+      showToast("Subscription activated — thank you!");
+      clearPaywall();
+      window.location.reload();
+
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  },
+
+  modal: {
+    ondismiss: function () {
+      showToast("Payment cancelled.", true);
+    },
+  },
+});
+
+razorpay.on("payment.failed", function (response) {
+  console.error("Payment failed:", response);
+
+  showToast(
+    response.error?.description ||
+      "Payment failed. Please try again.",
+    true
+  );
+});
+
+razorpay.open();
 }
