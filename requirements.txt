@@ -6,7 +6,7 @@ alembic==1.13.2
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.9
-pydantic==2.9.2
+pydantic[email]==2.9.2
 pydantic-settings==2.5.2
 python-dotenv==1.0.1
 razorpay==1.4.2
