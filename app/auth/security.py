@@ -5,8 +5,6 @@ import bcrypt
 
 from app.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def hash_password(password: str) -> str:
     password_bytes = password.encode("utf-8")
