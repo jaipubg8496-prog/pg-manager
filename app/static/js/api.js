@@ -375,17 +375,31 @@ async function startCheckout() {
       }
     : {},
 
-  theme: {
-    color: "#7A2E2E",
+  method: "upi",
+
+  config: {
+    display: {
+      blocks: {
+        banks: {
+          name: "Pay via UPI",
+          instruments: [
+            {
+              method: "upi",
+            },
+          ],
+        },
+      },
+
+      sequence: ["block.banks"],
+
+      preferences: {
+        show_default_blocks: false,
+      },
+    },
   },
 
-  method: {
-    upi: true,
-    card: false,
-    netbanking: false,
-    wallet: false,
-    emi: false,
-    paylater: false,
+  theme: {
+    color: "#7A2E2E",
   },
 
   handler: async function (response) {
