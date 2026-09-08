@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Properties — PG Manager</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="sidebar" id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="page-header">
+      <h1>Your properties</h1>
+      <button id="add-property-btn" class="small brick">+ Add property</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="search-properties" placeholder="Search by name or city…">
+      </div>
+    </div>
+
+    <div id="properties-container">
+      <div class="empty-state">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property — PG Manager</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="sidebar" id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <a href="/static/dashboard.html">&larr; All properties</a>
+        <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+          <h1 id="property-name" style="margin:0;">Loading…</h1>
+          <button id="edit-property-btn" class="icon-btn" title="Edit property"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        </div>
+      </div>
+      <div>
+        <label for="due-date-input" style="margin:0 0 4px 0;">This month's due date</label>
+        <div style="display:flex; gap:8px;">
+          <input type="date" id="due-date-input">
+          <button id="generate-cycles-btn" class="small brick">Generate rent</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="label">Pending this cycle</div>
+        <div class="value" id="stat-pending">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">Vacant beds</div>
+        <div class="value" id="stat-vacant">—</div>
+      </div>
+    </div>
+
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="rent">Rent &amp; tenants</button>
+      <button class="tab-btn" data-tab="rooms">Rooms &amp; beds</button>
+      <button class="tab-btn" data-tab="complaints">Complaints</button>
+    </div>
+
+    <!-- Rent & tenants tab -->
+    <div class="tab-panel active" id="tab-rent">
+      <div class="toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="search-tenants" placeholder="Search tenant by name or phone…">
+        </div>
+        <div class="filter-pills" id="status-filters">
+          <button class="filter-pill active" data-status="">All</button>
+          <button class="filter-pill" data-status="pending">Pending</button>
+          <button class="filter-pill" data-status="overdue">Overdue</button>
+          <button class="filter-pill" data-status="partial">Partial</button>
+          <button class="filter-pill" data-status="paid">Paid</button>
+        </div>
+        <button id="add-tenant-btn" class="small brick" style="margin-left:auto;">+ Add tenant</button>
+      </div>
+
+      <div class="scroll-panel">
+        <div id="rent-table-container"><div class="empty-state">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- Rooms & beds tab -->
+    <div class="tab-panel" id="tab-rooms">
+      <div class="toolbar">
+        <button id="add-room-btn" class="small brick" style="margin-left:auto;">+ Add room</button>
+      </div>
+
+      <div class="scroll-panel" style="padding: 4px 12px;">
+        <div id="rooms-container"><div class="empty-state">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- Complaints tab -->
+    <div class="tab-panel" id="tab-complaints">
+      <div class="toolbar">
+        <div class="filter-pills" id="complaint-filters">
+          <button class="filter-pill active" data-status="">All</button>
+          <button class="filter-pill" data-status="open">Open</button>
+          <button class="filter-pill" data-status="resolved">Resolved</button>
+        </div>
+        <button id="add-complaint-btn" class="small brick" style="margin-left:auto;">+ Log complaint</button>
+      </div>
+
+      <div class="scroll-panel" style="padding: 4px 12px;">
+        <div id="complaints-container"><div class="empty-state">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/property.js"></script>
+</body>
+</html>
