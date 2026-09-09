@@ -375,28 +375,6 @@ async function startCheckout() {
       }
     : {},
 
-  // UPI-only checkout. Only "config.display" should be used to restrict
-  // payment methods — combining it with a separate "method" flag (as this
-  // was doing with method: "upi", a string Razorpay doesn't actually accept)
-  // confuses the widget into finding zero valid instruments, which is what
-  // produced "No appropriate payment method found."
-  config: {
-    display: {
-      blocks: {
-        upi: {
-          name: "Pay via UPI",
-          instruments: [
-            { method: "upi", flows: ["intent", "collect"] },
-          ],
-        },
-      },
-      sequence: ["block.upi"],
-      preferences: {
-        show_default_blocks: false,
-      },
-    },
-  },
-
   theme: {
     color: "#7A2E2E",
   },
