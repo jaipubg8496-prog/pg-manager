@@ -12,6 +12,8 @@ def hash_password(password: str) -> str:
     return hashed.decode("utf-8")
 
 def verify_password(plain_password, hashed_password):
+    if not hashed_password:
+        return False  # Google-only account — no password to check against
     password_bytes = plain_password.encode("utf-8")
     hash_bytes = hashed_password.encode("utf-8")
 

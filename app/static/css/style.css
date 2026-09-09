@@ -121,6 +121,42 @@ a:hover { text-decoration: underline; }
   flex-shrink: 0;
 }
 
+/* ---------- Bottom nav (mobile app-style navigation) ---------- */
+/* Hidden entirely on desktop — the sidebar handles navigation there.
+   On mobile this becomes a fixed bottom tab bar instead (see media query),
+   which is what makes the site feel like an app instead of a shrunk-down
+   website — thumb-reachable, always in the same place, icon + label. */
+
+.bottom-nav {
+  display: none;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  padding: 8px 4px 6px 4px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.bottom-nav-item svg {
+  width: 21px;
+  height: 21px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+}
+
+.bottom-nav-item.active { color: var(--brick); }
+
 .main {
   flex: 1;
   height: 100vh;
@@ -402,6 +438,30 @@ button.small.brick:hover { background: var(--brick-dark); }
   margin-bottom: 24px;
 }
 
+/* Replaces the old two-box stat-row with one light, glanceable line —
+   two bordered cards for two numbers was exactly the kind of visual
+   overhead that made the page feel cluttered before you'd even scrolled
+   to real content. */
+.summary-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  flex-wrap: wrap;
+}
+.summary-bar strong {
+  color: var(--ink);
+  font-family: 'Lora', serif;
+  font-weight: 600;
+}
+.summary-bar .dot { color: var(--border); }
+
 .stat-row {
   display: flex;
   gap: 16px;
@@ -531,48 +591,25 @@ tr:last-child td { border-bottom: none; }
 .bed-chip.occupied { color: var(--ink-soft); }
 
 @media (max-width: 700px) {
-  /* ---- App shell & sidebar ---- */
+  /* ---- App shell: sidebar hidden entirely, bottom nav takes over ---- */
   .app-shell { flex-direction: column; height: auto; overflow: visible; }
-  .sidebar {
-    width: 100%;
-    height: auto;
-    overflow: visible;
-    flex-direction: row;
-    align-items: center;
-    padding: 10px 14px;
-    gap: 10px;
-  }
-  .sidebar .brand { display: none; }
+  .sidebar { display: none; }
 
-  .sidebar nav {
+  .bottom-nav {
     display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    flex: 1;
-    min-width: 0;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
   }
-  .sidebar nav a {
-    border-left: none;
-    border-bottom: 3px solid transparent;
-    white-space: nowrap;
-    padding: 8px 10px;
-  }
-  .sidebar nav a.active { border-left-color: transparent; border-bottom-color: var(--brick); }
 
-  /* Keep profile/logout reachable — this used to be hidden entirely on
-     mobile, which meant there was no way to log out or edit your profile
-     from a phone. Now it's a compact action row, not a whole panel. */
-  .sidebar .owner-info {
-    margin-top: 0;
-    padding: 0;
-    border-top: none;
-    flex-shrink: 0;
-  }
-  .sidebar .owner-name-block { display: none; }
-  .sidebar .owner-actions { margin-top: 0; gap: 12px; }
-  .sidebar .owner-info button { font-size: 0.8rem; }
+  /* Leave enough room at the bottom so content never hides behind the
+     fixed nav bar — 68px covers the bar itself plus a little breathing room. */
+  .main { padding: 16px 16px calc(68px + env(safe-area-inset-bottom, 0px)) 16px; height: auto; overflow: visible; }
 
-  .main { padding: 16px; height: auto; overflow: visible; }
   .trial-banner {
     position: static;
     margin: -16px -16px 16px -16px;
@@ -586,11 +623,9 @@ tr:last-child td { border-bottom: none; }
   /* ---- Prevent iOS Safari's zoom-on-focus (anything under 16px triggers it) ---- */
   input, select, textarea { font-size: 16px; }
 
-  /* ---- Page header: stack the due-date/generate-rent controls under the title ---- */
+  /* ---- Page header: title above, single action button full-width below ---- */
   .page-header { flex-direction: column; align-items: stretch; }
-  .page-header > div:last-child { width: 100%; }
-  .page-header > div:last-child > div { flex-direction: column; }
-  .page-header input[type="date"], .page-header button { width: 100%; }
+  .page-header > button { width: 100%; }
   h1 { font-size: 1.3rem; }
   /* Align the edit-pencil icon with the first line instead of the vertical
      center of a wrapped two-line property name (an inline style sets
@@ -598,10 +633,8 @@ tr:last-child td { border-bottom: none; }
   .page-header > div:first-child > div { align-items: flex-start !important; }
   .page-header .icon-btn { margin-top: 4px; }
 
-  /* ---- Stats: split evenly instead of a fixed min-width that can overflow ---- */
-  .stat-row { gap: 10px; }
-  .stat { flex: 1; min-width: 0; padding: 14px; }
-  .stat .value { font-size: 1.25rem; }
+  /* ---- Summary bar: let it wrap onto two lines gracefully on narrow screens ---- */
+  .summary-bar { font-size: 0.88rem; }
 
   /* ---- Toolbars: stack search / filters / add-button, each full-width and easy to tap ---- */
   .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
@@ -614,10 +647,47 @@ tr:last-child td { border-bottom: none; }
   .tab-nav { gap: 0; }
   .tab-btn { padding: 10px 8px; margin-right: 14px; font-size: 0.88rem; }
 
-  /* ---- Tables: scroll horizontally instead of squeezing text unreadably ---- */
-  .scroll-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .scroll-panel table { min-width: 560px; }
-  td, th { padding: 10px 8px; }
+  /* ---- Tables become cards on mobile — one bordered box per row, ----
+     ---- with column labels shown inline instead of a header row.    ---- */
+  .scroll-panel { overflow-x: visible; }
+  .scroll-panel table { display: block; min-width: 0; }
+  .scroll-panel thead { display: none; }
+  .scroll-panel tbody { display: block; }
+
+  .scroll-panel tr {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    background: var(--surface);
+  }
+  .scroll-panel tr:last-child { margin-bottom: 0; }
+
+  .scroll-panel td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+  .scroll-panel td::before {
+    content: attr(data-label);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-weight: 500;
+    text-align: left;
+    flex-shrink: 0;
+  }
+  .scroll-panel td.actions-cell {
+    display: block;
+    padding-top: 10px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+  .scroll-panel td.actions-cell .row-actions { justify-content: flex-start; }
 
   /* ---- Bigger, easier-to-tap icon buttons ---- */
   .icon-btn { padding: 8px; }
@@ -747,14 +817,14 @@ button.small.ghost:hover { color: var(--brick); }
 .filter-pill {
   padding: 6px 13px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid transparent;
+  background: none;
   font-size: 0.82rem;
   color: var(--ink-soft);
   cursor: pointer;
 }
 
-.filter-pill:hover { border-color: var(--brick); color: var(--ink); }
+.filter-pill:hover { background: var(--bg); color: var(--ink); }
 .filter-pill.active { background: var(--brick); border-color: var(--brick); color: #fff; }
 
 /* ---------- Icon buttons (edit / delete on rows & cards) ---------- */

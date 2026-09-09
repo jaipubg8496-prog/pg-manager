@@ -12,13 +12,6 @@ let rentSearch = "";
 let rentStatusFilter = "";
 let complaintStatusFilter = "";
 
-// Default the due-date input to the 5th of next month.
-(function setDefaultDueDate() {
-  const now = new Date();
-  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 5);
-  document.getElementById("due-date-input").value = nextMonth.toISOString().slice(0, 10);
-})();
-
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str ?? "";
@@ -96,12 +89,12 @@ async function loadRentStatus() {
             const isSettled = c && c.status === "paid";
             return `
               <tr>
-                <td>${escapeHtml(row.tenant_name)}</td>
-                <td>${c ? formatDate(c.due_date) : "—"}</td>
-                <td class="num">${c ? formatCurrency(c.amount_due) : "—"}</td>
-                <td class="num">${c ? formatCurrency(c.amount_paid) : "—"}</td>
-                <td>${c ? statusBadge(c.status) : `<span style="color:var(--ink-soft); font-size:0.85rem;">no cycle yet</span>`}</td>
-                <td>
+                <td data-label="Tenant">${escapeHtml(row.tenant_name)}</td>
+                <td data-label="Due date">${c ? formatDate(c.due_date) : "—"}</td>
+                <td class="num" data-label="Due">${c ? formatCurrency(c.amount_due) : "—"}</td>
+                <td class="num" data-label="Paid">${c ? formatCurrency(c.amount_paid) : "—"}</td>
+                <td data-label="Status">${c ? statusBadge(c.status) : `<span style="color:var(--ink-soft); font-size:0.85rem;">no cycle yet</span>`}</td>
+                <td class="actions-cell">
                   <div class="row-actions">
                     ${c && !isSettled ? `<button class="small" data-remind="${c.id}">WhatsApp</button>
                     <button class="small brick" data-markpaid="${c.id}" data-due="${c.amount_due}">Mark paid</button>` : ""}
@@ -234,13 +227,20 @@ async function deleteTenant(tenantId) {
 }
 
 document.getElementById("generate-cycles-btn").addEventListener("click", async () => {
-  const dueDate = document.getElementById("due-date-input").value;
-  if (!dueDate) {
-    showToast("Pick a due date first.", true);
-    return;
-  }
+  const now = new Date();
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 5);
+
+  const result = await openModal({
+    title: "Generate this month's rent",
+    fields: [
+      { name: "due_date", label: "Due date", type: "date", value: nextMonth.toISOString().slice(0, 10), required: true },
+    ],
+    submitLabel: "Generate",
+  });
+  if (!result) return;
+
   try {
-    await apiFetch(`/api/properties/${propertyId}/rent-cycles/generate?due_date=${dueDate}`, {
+    await apiFetch(`/api/properties/${propertyId}/rent-cycles/generate?due_date=${result.due_date}`, {
       method: "POST",
     });
     showToast("Rent cycles generated");

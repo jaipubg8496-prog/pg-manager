@@ -239,6 +239,35 @@ async function renderSidebar(active) {
   `;
   document.getElementById("logout-btn").addEventListener("click", logout);
   document.getElementById("edit-profile-btn").addEventListener("click", () => editProfile(owner));
+
+  renderBottomNav(active, owner);
+}
+
+/**
+ * Mobile-only bottom tab bar — this is what makes the app feel like an app
+ * instead of a responsive website. Desktop keeps the sidebar; mobile hides
+ * it entirely and uses this instead (see the CSS media query).
+ */
+function renderBottomNav(active, owner) {
+  let root = document.getElementById("bottom-nav-root");
+  if (!root) return;
+
+  root.innerHTML = `
+    <a href="/static/dashboard.html" class="bottom-nav-item ${active === 'properties' ? 'active' : ''}">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/></svg>
+      <span>Properties</span>
+    </a>
+    <button id="bottom-nav-profile" class="bottom-nav-item">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+      <span>Profile</span>
+    </button>
+    <button id="bottom-nav-logout" class="bottom-nav-item">
+      ${ICONS.logout}
+      <span>Log out</span>
+    </button>
+  `;
+  document.getElementById("bottom-nav-profile").addEventListener("click", () => editProfile(owner));
+  document.getElementById("bottom-nav-logout").addEventListener("click", logout);
 }
 
 async function editProfile(owner) {
@@ -287,7 +316,10 @@ async function initBilling() {
       return false;
     }
 
-    if (sub.status === "trial") {
+    // Free trial is 3 months — no need to nag about it from day one. Only
+    // start showing the reminder banner once it's genuinely close to ending.
+    const TRIAL_BANNER_THRESHOLD_DAYS = 7;
+    if (sub.status === "trial" && sub.days_left <= TRIAL_BANNER_THRESHOLD_DAYS) {
       showTrialBanner(sub);
     }
     return true;
@@ -374,6 +406,28 @@ async function startCheckout() {
         contact: owner.phone,
       }
     : {},
+
+  // UPI-only checkout. Only "config.display" should be used to restrict
+  // payment methods — combining it with a separate "method" flag (as this
+  // was doing with method: "upi", a string Razorpay doesn't actually accept)
+  // confuses the widget into finding zero valid instruments, which is what
+  // produced "No appropriate payment method found."
+  config: {
+    display: {
+      blocks: {
+        upi: {
+          name: "Pay via UPI",
+          instruments: [
+            { method: "upi", flows: ["intent", "collect"] },
+          ],
+        },
+      },
+      sequence: ["block.upi"],
+      preferences: {
+        show_default_blocks: false,
+      },
+    },
+  },
 
   theme: {
     color: "#7A2E2E",
