@@ -230,8 +230,8 @@ async function renderSidebar(active) {
       <a href="/static/dashboard.html" class="${active === 'properties' ? 'active' : ''}">Properties</a>
     </nav>
     <div class="owner-info">
-      Signed in as<br><strong>${owner.name}</strong>
-      <div style="display:flex; gap:14px; margin-top: 8px;">
+      <div class="owner-name-block">Signed in as<br><strong>${owner.name}</strong></div>
+      <div class="owner-actions">
         <button id="edit-profile-btn">Edit profile</button>
         <button id="logout-btn">${ICONS.logout} Log out</button>
       </div>
@@ -375,23 +375,22 @@ async function startCheckout() {
       }
     : {},
 
-  method: "upi",
-
+  // UPI-only checkout. Only "config.display" should be used to restrict
+  // payment methods — combining it with a separate "method" flag (as this
+  // was doing with method: "upi", a string Razorpay doesn't actually accept)
+  // confuses the widget into finding zero valid instruments, which is what
+  // produced "No appropriate payment method found."
   config: {
     display: {
       blocks: {
-        banks: {
+        upi: {
           name: "Pay via UPI",
           instruments: [
-            {
-              method: "upi",
-            },
+            { method: "upi", flows: ["intent", "collect"] },
           ],
         },
       },
-
-      sequence: ["block.banks"],
-
+      sequence: ["block.upi"],
       preferences: {
         show_default_blocks: false,
       },

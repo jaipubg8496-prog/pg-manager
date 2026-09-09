@@ -95,6 +95,12 @@ a:hover { text-decoration: underline; }
   color: var(--ink-soft);
 }
 
+.sidebar .owner-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+}
+
 .sidebar .owner-info button {
   background: none;
   border: none;
@@ -525,14 +531,119 @@ tr:last-child td { border-bottom: none; }
 .bed-chip.occupied { color: var(--ink-soft); }
 
 @media (max-width: 700px) {
+  /* ---- App shell & sidebar ---- */
   .app-shell { flex-direction: column; height: auto; overflow: visible; }
-  .sidebar { width: 100%; height: auto; overflow: visible; flex-direction: row; overflow-x: auto; padding: 12px; }
-  .sidebar .brand, .sidebar .owner-info { display: none; }
-  .sidebar nav { display: flex; }
-  .sidebar nav a { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 10px;
+  }
+  .sidebar .brand { display: none; }
+
+  .sidebar nav {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-width: 0;
+  }
+  .sidebar nav a {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    padding: 8px 10px;
+  }
   .sidebar nav a.active { border-left-color: transparent; border-bottom-color: var(--brick); }
-  .main { padding: 20px; height: auto; overflow: visible; }
-  .trial-banner { position: static; margin: 0 0 20px 0; }
+
+  /* Keep profile/logout reachable — this used to be hidden entirely on
+     mobile, which meant there was no way to log out or edit your profile
+     from a phone. Now it's a compact action row, not a whole panel. */
+  .sidebar .owner-info {
+    margin-top: 0;
+    padding: 0;
+    border-top: none;
+    flex-shrink: 0;
+  }
+  .sidebar .owner-name-block { display: none; }
+  .sidebar .owner-actions { margin-top: 0; gap: 12px; }
+  .sidebar .owner-info button { font-size: 0.8rem; }
+
+  .main { padding: 16px; height: auto; overflow: visible; }
+  .trial-banner {
+    position: static;
+    margin: -16px -16px 16px -16px;
+    padding: 10px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .trial-banner button { width: 100%; }
+
+  /* ---- Prevent iOS Safari's zoom-on-focus (anything under 16px triggers it) ---- */
+  input, select, textarea { font-size: 16px; }
+
+  /* ---- Page header: stack the due-date/generate-rent controls under the title ---- */
+  .page-header { flex-direction: column; align-items: stretch; }
+  .page-header > div:last-child { width: 100%; }
+  .page-header > div:last-child > div { flex-direction: column; }
+  .page-header input[type="date"], .page-header button { width: 100%; }
+  h1 { font-size: 1.3rem; }
+  /* Align the edit-pencil icon with the first line instead of the vertical
+     center of a wrapped two-line property name (an inline style sets
+     align-items:center for this row, so it needs !important to override). */
+  .page-header > div:first-child > div { align-items: flex-start !important; }
+  .page-header .icon-btn { margin-top: 4px; }
+
+  /* ---- Stats: split evenly instead of a fixed min-width that can overflow ---- */
+  .stat-row { gap: 10px; }
+  .stat { flex: 1; min-width: 0; padding: 14px; }
+  .stat .value { font-size: 1.25rem; }
+
+  /* ---- Toolbars: stack search / filters / add-button, each full-width and easy to tap ---- */
+  .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .search-box { max-width: none; width: 100%; }
+  .filter-pills { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .filter-pill { flex-shrink: 0; }
+  .toolbar > button { width: 100%; margin-left: 0 !important; }
+
+  /* ---- Tabs: comfortable tap targets, no cramped text ---- */
+  .tab-nav { gap: 0; }
+  .tab-btn { padding: 10px 8px; margin-right: 14px; font-size: 0.88rem; }
+
+  /* ---- Tables: scroll horizontally instead of squeezing text unreadably ---- */
+  .scroll-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .scroll-panel table { min-width: 560px; }
+  td, th { padding: 10px 8px; }
+
+  /* ---- Bigger, easier-to-tap icon buttons ---- */
+  .icon-btn { padding: 8px; }
+  .row-actions { gap: 8px; }
+  .row-actions button.small { padding: 8px 12px; }
+
+  /* ---- Rooms & complaints cards: a little more breathing room ---- */
+  .room-block { padding: 14px; }
+  .room-block > div:first-child { flex-direction: column; align-items: flex-start !important; gap: 10px; }
+  .room-block .row-actions { width: 100%; }
+  .complaint-item { flex-direction: column; align-items: stretch; gap: 10px; }
+  .complaint-item .actions { flex-wrap: wrap; }
+
+  /* ---- Modals: comfortable padding, full-width stacked actions ---- */
+  .modal-overlay { padding: 12px; }
+  .modal-box { padding: 22px 20px; }
+  .modal-actions { flex-direction: column-reverse; }
+  .modal-actions button { width: 100%; }
+
+  /* ---- Add-property/room/tenant inline forms: stack fields full-width ---- */
+  .inline-form { flex-direction: column; align-items: stretch; }
+  .inline-form > div { width: 100%; }
+  .inline-form > button { width: 100%; }
+
+  /* ---- Paywall card ---- */
+  .paywall-card { padding: 28px 22px; }
 }
 
 /* ---------- Danger button variant ---------- */
